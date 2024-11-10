@@ -46,6 +46,8 @@ function solver(problem_instance; args...)
 	setdist = set_vertex_dist(dist, num_sets, membership)
 	powers = initialize_powers(param)
 
+  tour_history = Array{Tuple{Float64, Array{Int64,1}, Int64},1}()
+
 	while count[:cold_trial] <= param[:cold_trials]
 		# build tour from scratch on a cold restart
 		best = initial_tour!(lowest, dist, sets, setdist, count[:cold_trial], param)
@@ -103,7 +105,8 @@ function solver(problem_instance; args...)
 					timer = (time_ns() - start_time)/1.0e9
 					lowest.cost > best.cost && (lowest = best)
 					print_best(count, param, best, lowest, init_time)
-					print_summary(lowest, timer, membership, param)
+          push!(tour_history, (round(timer, digits=3), lowest.tour, lowest.cost))
+					print_summary(lowest, timer, membership, param, tour_history)
 					return
 				end
 
@@ -126,6 +129,7 @@ function solver(problem_instance; args...)
 
 	end
 	timer = (time_ns() - start_time)/1.0e9
-	print_summary(lowest, timer, membership, param)
+  push!(tour_history, (round(timer, digits=3), lowest.tour, lowest.cost))
+	print_summary(lowest, timer, membership, param, tour_history)
 end
 end

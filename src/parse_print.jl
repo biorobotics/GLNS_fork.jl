@@ -506,7 +506,7 @@ end
 
 """print tour summary at end of execution"""
 function print_summary(lowest::Tour, timer::Float64, member::Array{Int64,1},
-						param::Dict{Symbol,Any})
+						param::Dict{Symbol,Any}, tour_history::Array{Tuple{Float64, Array{Int64,1}, Int64},1})
 	if param[:print_output] == 3 && !param[:timeout] && !param[:budget_met]
 		progress_bar(param[:cold_trials], 1.0, lowest.cost, round(timer, digits=1))
 	end
@@ -525,7 +525,7 @@ function print_summary(lowest::Tour, timer::Float64, member::Array{Int64,1},
 			println("-----------------------------------")
 		end
 		if param[:output_file] != "None"
-			s = open(param[:output_file], "w")
+      s = open(param[:output_file], "w")
 			write(s, "Problem Instance : ", param[:problem_instance], "\n")
 			write(s, "Vertices         : ", string(param[:num_vertices]), "\n")
 			write(s, "Sets             : ", string(param[:num_sets]), "\n")
@@ -533,7 +533,11 @@ function print_summary(lowest::Tour, timer::Float64, member::Array{Int64,1},
 			write(s, "Host Computer    : ", gethostname(), "\n")
 			write(s, "Solver Time      : ", string(round(timer, digits=3)), " sec\n")
 			write(s, "Tour Cost        : ", string(lowest.cost), "\n")
-			write(s, "Tour             : ", string(lowest.tour))
+			write(s, "Tour             : ", string(lowest.tour), "\n")
+			write(s, "Tour History     :\n")
+      for tour in tour_history
+        write(s, string(tour), "\n")
+      end
 			close(s)
 		end
 	end
