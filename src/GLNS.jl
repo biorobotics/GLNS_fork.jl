@@ -51,6 +51,7 @@ function solver(problem_instance; args...)
 	while count[:cold_trial] <= param[:cold_trials]
 		# build tour from scratch on a cold restart
 		best = initial_tour!(lowest, dist, sets, setdist, count[:cold_trial], param)
+    timer = (time_ns() - start_time)/1.0e9
 		# print_cold_trial(count, param, best)
 		phase = :early
 
@@ -104,8 +105,8 @@ function solver(problem_instance; args...)
 					param[:budget_met] = (best.cost <= param[:budget])
 					timer = (time_ns() - start_time)/1.0e9
 					lowest.cost > best.cost && (lowest = best)
-					print_best(count, param, best, lowest, init_time)
           push!(tour_history, (round(timer, digits=3), lowest.tour, lowest.cost))
+					print_best(count, param, best, lowest, init_time)
 					print_summary(lowest, timer, membership, param, tour_history)
 					return
 				end
@@ -113,6 +114,12 @@ function solver(problem_instance; args...)
 		        temperature *= cooling_rate  # cool the temperature
 				iter_count += 1
 				count[:total_iter] += 1
+
+        if length(tour_history) == 0 || (best.cost < tour_history[end][3])
+          timer = (time_ns() - start_time)/1.0e9
+          push!(tour_history, (round(timer, digits=3), best.tour, best.cost))
+        end
+
 				print_best(count, param, best, lowest, init_time)
 			end
 			print_warm_trial(count, param, best, iter_count)
