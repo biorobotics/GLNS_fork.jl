@@ -245,7 +245,13 @@ function initial_tour!(lowest::Tour, dist::Array{Int64, 2}, sets::Array{Any, 1},
 		random_insertion!(best.tour, sets_to_insert, dist, sets, setdist)
 	end
 	best.cost = tour_cost(best.tour, dist)
-	lowest.cost > best.cost && (lowest = best)
+  # I think the original GLNS code had a bug here, since it set lowest = best, even though this does not change lowest upon returning.
+  # On the other hand, I don't think this bug affected algorithm behavior
+	# lowest.cost > best.cost && (lowest = best)
+  if lowest.cost > best.cost
+    lowest.cost = best.cost
+    lowest.tour = best.tour
+  end
 	return best
 end
 
